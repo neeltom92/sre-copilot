@@ -1,0 +1,32 @@
+# Streamlit web framework
+streamlit>=1.28.0
+
+# Data manipulation
+pandas>=2.0.0
+numpy>=1.24.0
+
+# LangChain ecosystem
+langchain>=0.3.0
+langchain-anthropic>=0.3.0
+langchain-core>=0.3.0
+langgraph>=0.2.0
+
+# Datadog API client
+datadog-api-client>=2.20.0
+
+# PagerDuty API client
+pdpyras>=5.2.0
+
+# Kubernetes API client
+kubernetes>=28.1.0
+
+# Environment config
+python-dotenv>=1.0.0
+
+# JWT decoding for Okta user extraction
+pyjwt>=2.8.0
+
+# FastAPI for optional React frontend
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+httpx>=0.26.0

@@ -1,0 +1,18 @@
+{{- if .Values.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sre-copilot.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "sre-copilot.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type | default "ClusterIP" }}
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: {{ .Values.service.targetPort }}
+    protocol: TCP
+    name: web
+  selector:
+    {{- include "sre-copilot.selectorLabels" . | nindent 4 }}
+{{- end }}

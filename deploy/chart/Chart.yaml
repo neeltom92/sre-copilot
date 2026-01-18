@@ -1,0 +1,19 @@
+apiVersion: v2
+name: sre-copilot
+description: AI-powered SRE assistant with Datadog APM, PagerDuty, and Kubernetes integration
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+home: https://github.com/neeltom92/sre-copilot
+sources:
+  - https://github.com/neeltom92/sre-copilot
+keywords:
+  - sre
+  - observability
+  - ai
+  - kubernetes
+  - datadog
+  - pagerduty
+maintainers:
+  - name: neeltom92
+    url: https://github.com/neeltom92

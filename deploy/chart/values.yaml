@@ -1,0 +1,108 @@
+# SRE Copilot Kubernetes Deployment Values
+#
+# This is a sample values file for deploying SRE Copilot.
+# Customize these values according to your Kubernetes environment.
+
+# Namespace for deployment
+namespace: sre-copilot
+
+# Number of replicas (will be managed by HPA if enabled)
+replicaCount: 1
+
+# Service account configuration (optional)
+serviceAccount:
+  enabled: true
+  name: sre-copilot
+
+# Application configuration
+application:
+  image:
+    repository: "ghcr.io/neeltom92/sre-copilot"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  ports:
+    web: 8501
+
+  probes:
+    liveness:
+      httpGet:
+        path: /_stcore/health
+        port: web
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    readiness:
+      httpGet:
+        path: /_stcore/health
+        port: web
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 2
+
+  # Environment variables
+  env:
+    # Open (non-secret) environment variables
+    open:
+      PORT: "8501"
+      DATADOG_SITE: "datadoghq.com"
+      CLAUDE_MODEL: "claude-sonnet-4-20250514"
+      K8S_ENABLED: "true"
+
+    # Secret environment variables
+    # Create the secret before deploying:
+    # kubectl create secret generic sre-copilot-secrets \
+    #   --from-literal=ANTHROPIC_API_KEY=your-key \
+    #   --from-literal=DATADOG_API_KEY=your-key \
+    #   --from-literal=DATADOG_APP_KEY=your-key \
+    #   --from-literal=PAGERDUTY_API_KEY=your-key \
+    #   -n sre-copilot
+    secrets:
+      name: "sre-copilot-secrets"
+      keys:
+        - "ANTHROPIC_API_KEY"
+        - "DATADOG_API_KEY"
+        - "DATADOG_APP_KEY"
+        - "PAGERDUTY_API_KEY"
+
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "500m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+
+# Service configuration
+service:
+  enabled: true
+  type: ClusterIP
+  port: 80
+  targetPort: 8501
+
+# Horizontal Pod Autoscaler
+hpa:
+  enabled: true
+  cpu: "50"
+  minReplicaCount: "1"
+  maxReplicaCount: "4"
+
+# Ingress configuration (disabled by default - use port-forwarding for testing)
+# Enable for production with proper ingress controller
+ingress:
+  enabled: false  # Set to true to enable ingress
+  ingressClassName: nginx  # Change to your ingress class (nginx, alb, etc.)
+  hostname: sre-copilot.example.com
+  tls: false  # Set to true to enable HTTPS
+  tlsSecretName: sre-copilot-tls
+  # Add your ingress annotations here (e.g., for cert-manager, ALB, etc.)
+  annotations: {}
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # kubernetes.io/ingress.class: nginx
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+# Pod security context
+podSecurityContext:
+  runAsUser: 1000

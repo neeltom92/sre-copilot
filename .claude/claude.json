@@ -1,0 +1,22 @@
+{
+  "name": "{SAFE_APP_NAME}",
+  "description": "{APP_DESCRIPTION}",
+  "version": "1.0.0",
+  "commands": {
+    "aicore-bootstrap": {
+      "description": "Understand and bootstrap your Streamlit app",
+      "file": "commands/aicore-bootstrap.md"
+    }
+  },
+  "hooks": {
+    "user-prompt-submit": {
+      "script": "hooks/user-prompt-submit.sh",
+      "description": "Auto-checkout develop branch on prompt"
+    }
+  },
+  "settings": {
+    "defaultBranch": "develop",
+    "autoCheckout": true,
+    "platform": "slick-streamlit-1click-platform"
+  }
+}

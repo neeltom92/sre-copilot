@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sre-copilot.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "sre-copilot.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      {{- include "sre-copilot.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sre-copilot.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ include "sre-copilot.serviceAccountName" . }}
+      {{- end }}
+      {{- if .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: sre-copilot
+        image: "{{ .Values.application.image.repository }}:{{ .Values.application.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.application.image.pullPolicy | default "IfNotPresent" }}
+        ports:
+        - name: web
+          containerPort: {{ .Values.application.ports.web }}
+          protocol: TCP
+        env:
+        {{- range $key, $value := .Values.application.env.open }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        {{- if .Values.application.env.secrets }}
+        {{- range .Values.application.env.secrets.keys }}
+        - name: {{ . }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ $.Values.application.env.secrets.name }}
+              key: {{ . }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.application.probes.liveness }}
+        livenessProbe:
+          {{- toYaml .Values.application.probes.liveness | nindent 10 }}
+        {{- end }}
+        {{- if .Values.application.probes.readiness }}
+        readinessProbe:
+          {{- toYaml .Values.application.probes.readiness | nindent 10 }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.application.resources | nindent 10 }}

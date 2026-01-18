@@ -1,0 +1,92 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Project specific
+*.log
+*.bak
+*.backup
+*.npy
+*.npz
+logs/
+data/raw/
+data/processed/
+models/
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Test and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# Jupyter
+*.ipynb_checkpoints/
+notebooks/
+
+# Build artifacts
+*.tar.gz
+*.zip
+
+# Helm
+deploy/chart/charts/
+deploy/chart/Chart.lock
+deploy/chart/*.tgz
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars
+

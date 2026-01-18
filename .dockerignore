@@ -1,0 +1,254 @@
+# =============================================================================
+# Comprehensive .dockerignore for Streamlit Container
+# =============================================================================
+# This file excludes unnecessary files to minimize Docker build context
+
+# Version control
+.git
+.git/
+.gitignore
+.github/
+.gitattributes
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtual environments (CRITICAL: These are huge!)
+venv/
+ENV/
+env/
+.venv/
+.env.local/
+.virtualenv/
+
+# IDE and editor files
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# =============================================================================
+# Large Data Files
+# =============================================================================
+
+# Large model files and directories
+models/
+models/*
+*.model
+*.bin
+*.h5
+*.pkl
+*.safetensors
+*.onnx
+*.pt
+*.pth
+
+# Large data directories
+data/raw/
+data/processed/
+data/*
+!data/.gitkeep
+
+# Large embeddings and numpy files
+*.npy
+*.npz
+embeddings/
+embeddings/*
+
+# Raw CSV files (exclude large data files)
+*.csv
+!**/example.csv  # Keep example files if needed
+
+# Large compressed files
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# =============================================================================
+# Logs and Temporary Files
+# =============================================================================
+
+# Log directories and files
+logs/
+*.log
+*.log.*
+
+# Temporary and backup files
+*.backup
+*.bak
+*.tmp
+tmp/
+temp/
+
+# =============================================================================
+# Documentation and Test Files
+# =============================================================================
+
+# Documentation
+docs/
+documentation/
+*.md
+!README.md  # Keep main README
+
+# Test files
+tests/
+test/
+*_test.py
+test_*.py
+pytest.ini
+.pytest_cache/
+
+# =============================================================================
+# Environment and Configuration Files
+# =============================================================================
+
+# Environment files (keep only what's needed)
+.env.example
+env.example
+.env.local
+.env.development
+.env.test
+
+# Docker files themselves
+Dockerfile
+Dockerfile.*
+docker-compose.yml
+docker-compose.yaml
+docker-compose.*.yml
+.dockerignore
+
+# Build scripts (not needed in container)
+build_*.sh
+deploy_*.sh
+*.sh
+
+# =============================================================================
+# Jupyter and Notebook Files
+# =============================================================================
+
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints/
+notebooks/
+
+# =============================================================================
+# Media and Asset Files
+# =============================================================================
+
+# Image and media files (unless needed for UI)
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.mp4
+*.avi
+*.mov
+images/
+assets/
+
+# =============================================================================
+# Additional Language-Specific Excludes
+# =============================================================================
+
+# Node.js (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.dylib
+
+# Rust
+target/
+
+# Java
+*.class
+*.jar
+*.war
+
+# =============================================================================
+# Cache Directories
+# =============================================================================
+
+# Various cache directories
+.cache/
+cache/
+.mypy_cache/
+.ruff_cache/
+
+# =============================================================================
+# CI/CD and Deployment
+# =============================================================================
+
+# Kubernetes/Helm
+deploy/
+helm/
+k8s/
+.kube/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars
+
+# =============================================================================
+# OS and System Files
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+
+
+
+
+
