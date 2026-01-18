@@ -5,6 +5,8 @@ An AI-powered SRE chat assistant that integrates with Datadog APM, PagerDuty, an
 ## 🚀 Quick Start (3 Commands!)
 
 ```bash
+git clone https://github.com/neeltom92/sre-copilot.git
+cd sre-copilot
 make first-time-setup
 vim .env  # Add your API keys
 make run
@@ -40,10 +42,14 @@ make run
 **First-time users - just run this:**
 
 ```bash
-# 1. Run one-command setup (installs everything!)
+# 1. Clone the repository
+git clone https://github.com/neeltom92/sre-copilot.git
+cd sre-copilot
+
+# 2. Run one-command setup (installs everything!)
 make first-time-setup
 
-# 2. Edit .env and add your API keys
+# 3. Edit .env and add your API keys
 vim .env  # or: code .env, or: open -e .env
 
 # Required:
@@ -54,7 +60,7 @@ vim .env  # or: code .env, or: open -e .env
 #   DATADOG_APP_KEY=your-datadog-app-key
 #   PAGERDUTY_API_KEY=your-pagerduty-key (for incident management)
 
-# 3. Run the app
+# 4. Run the app
 make run
 ```
 
