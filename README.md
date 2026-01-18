@@ -14,6 +14,10 @@ make run
 
 **→ Open http://localhost:8501 and start chatting!**
 
+## Demo
+
+<!--  -->
+
 ## Features
 
 - **Claude AI Chat**: Natural language interface powered by Claude Sonnet
@@ -75,9 +79,6 @@ Open http://localhost:8501 in your browser and start chatting!
 5. ✅ **Verifies installation** (shows installed packages)
 6. ✅ **Shows clear next steps** (with helpful links and commands)
 
-## Demo
-
-<!--  -->
 
 **Example output:**
 ```
