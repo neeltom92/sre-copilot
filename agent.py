@@ -24,7 +24,8 @@ from config import Config
 from tools.datadog_tools import DatadogTools
 from tools.pagerduty_tools import PagerDutyTools
 from tools.kubernetes_tools import KubernetesTools
-from tools.langchain_tools import create_datadog_tools, create_pagerduty_tools, create_kubernetes_tools
+from tools.sqs_tools import SQSTools
+from tools.langchain_tools import create_datadog_tools, create_pagerduty_tools, create_kubernetes_tools, create_sqs_tools
 
 logger = logging.getLogger(__name__)
 
@@ -135,6 +136,12 @@ You have access to Datadog and PagerDuty tools to help investigate issues, check
 - View logs from crashed containers (previous logs)
 - Support multi-container pods
 
+### AWS SQS (Read-Only)
+- List SQS queues in the account
+- Get queue attributes (message counts, age, DLQ config)
+- Peek at messages without removing them
+- Inspect dead-letter queue contents
+
 ## Kubernetes - Two Ways to Access:
 
 ### 1. Direct Kubernetes Access (Real-time, No Lag) - USE THIS FOR POD OPERATIONS
@@ -231,6 +238,7 @@ class SREAgent:
     _datadog: Optional[DatadogTools] = None
     _pagerduty: Optional[PagerDutyTools] = None
     _kubernetes: Optional[KubernetesTools] = None
+    _sqs: Optional[SQSTools] = None
 
     def __post_init__(self):
         """Initialize the agent components."""
@@ -257,6 +265,15 @@ class SREAgent:
         if self.config.is_kubernetes_configured():
             self._kubernetes = KubernetesTools(kubeconfig_path=self.config.kubeconfig_path)
             self._tools.extend(create_kubernetes_tools(self._kubernetes))
+
+        if self.config.is_sqs_configured():
+            self._sqs = SQSTools(
+                aws_region=self.config.aws_region,
+                aws_access_key=self.config.aws_access_key or None,
+                aws_secret_key=self.config.aws_secret_key or None,
+                aws_profile=self.config.aws_profile or None,
+            )
+            self._tools.extend(create_sqs_tools(self._sqs))
 
     def _setup_llm(self):
         """Initialize the Claude LLM with tools."""
@@ -462,6 +479,7 @@ class SREAgent:
             "datadog_configured": self.config.is_datadog_configured(),
             "pagerduty_configured": self.config.is_pagerduty_configured(),
             "kubernetes_configured": self.config.is_kubernetes_configured(),
+            "sqs_configured": self.config.is_sqs_configured(),
             "available_tools": len(self._tools),
             "graph_ready": self._compiled_graph is not None,
         }

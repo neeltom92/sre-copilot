@@ -16,6 +16,11 @@ Environment variables:
 - DATADOG_SITE: Datadog site (default: datadoghq.com)
 - KUBECONFIG: Path to kubeconfig file (default: ~/.kube/config)
 - K8S_ENABLED: Enable Kubernetes integration (default: true)
+- AWS_REGION: AWS region for SQS (default: us-east-1)
+- AWS_ACCESS_KEY_ID: AWS access key (optional, can use IAM roles/profiles)
+- AWS_SECRET_ACCESS_KEY: AWS secret key (optional)
+- AWS_PROFILE: AWS profile name (optional)
+- SQS_ENABLED: Enable AWS SQS integration (default: true)
 """
 
 import os
@@ -75,6 +80,13 @@ class Config:
     kubeconfig_path: str = "~/.kube/config"
     k8s_enabled: bool = True
 
+    # AWS SQS
+    aws_region: str = "us-east-1"
+    aws_access_key: str = ""
+    aws_secret_key: str = ""
+    aws_profile: str = ""
+    sqs_enabled: bool = True
+
     @classmethod
     def from_env(cls) -> "Config":
         """Load configuration from environment variables."""
@@ -87,6 +99,11 @@ class Config:
             pagerduty_api_key=os.getenv("PAGERDUTY_API_KEY", ""),
             kubeconfig_path=os.getenv("KUBECONFIG", os.path.expanduser("~/.kube/config")),
             k8s_enabled=os.getenv("K8S_ENABLED", "true").lower() == "true",
+            aws_region=os.getenv("AWS_REGION", "us-east-1"),
+            aws_access_key=os.getenv("AWS_ACCESS_KEY_ID", ""),
+            aws_secret_key=os.getenv("AWS_SECRET_ACCESS_KEY", ""),
+            aws_profile=os.getenv("AWS_PROFILE", ""),
+            sqs_enabled=os.getenv("SQS_ENABLED", "true").lower() == "true",
         )
 
     def is_anthropic_configured(self) -> bool:
@@ -104,6 +121,10 @@ class Config:
     def is_kubernetes_configured(self) -> bool:
         """Check if Kubernetes is configured."""
         return self.k8s_enabled and os.path.exists(os.path.expanduser(self.kubeconfig_path))
+
+    def is_sqs_configured(self) -> bool:
+        """Check if AWS SQS is configured (can use IAM roles, profiles, or explicit keys)."""
+        return self.sqs_enabled
 
 
 # Global config instance

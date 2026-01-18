@@ -20,6 +20,9 @@ pdpyras>=5.2.0
 # Kubernetes API client
 kubernetes>=28.1.0
 
+# AWS SDK for SQS
+boto3>=1.34.0
+
 # Environment config
 python-dotenv>=1.0.0
 

@@ -11,6 +11,7 @@ from langchain_core.tools import BaseTool
 from tools.datadog_tools import DatadogTools
 from tools.pagerduty_tools import PagerDutyTools
 from tools.kubernetes_tools import KubernetesTools
+from tools.sqs_tools import SQSTools
 
 
 # =============================================================================
@@ -156,6 +157,30 @@ class GetPodLogsInput(BaseModel):
     tail_lines: int = Field(100, description="Number of lines to retrieve (default: 100, max: 10000)")
     since_seconds: Optional[int] = Field(None, description="Only return logs newer than N seconds")
     previous: bool = Field(False, description="If True, get logs from previous container (for crashed pods)")
+
+
+# =============================================================================
+# AWS SQS Tool Schemas
+# =============================================================================
+
+class SQSListQueuesInput(BaseModel):
+    queue_name_prefix: Optional[str] = Field(None, description="Filter queues by name prefix")
+    max_results: int = Field(100, description="Maximum queues to return (max: 1000)")
+
+
+class SQSGetQueueAttributesInput(BaseModel):
+    queue_url: str = Field(..., description="SQS queue URL")
+
+
+class SQSPeekMessagesInput(BaseModel):
+    queue_url: str = Field(..., description="SQS queue URL")
+    max_messages: int = Field(10, description="Maximum messages to peek at (1-10)")
+    wait_time_seconds: int = Field(0, description="Long polling wait time (0-20 seconds)")
+
+
+class SQSGetQueueUrlInput(BaseModel):
+    queue_name: str = Field(..., description="Name of the SQS queue")
+    account_id: Optional[str] = Field(None, description="AWS account ID (for cross-account access)")
 
 
 # =============================================================================
@@ -348,4 +373,51 @@ def create_kubernetes_tools(k8s: KubernetesTools) -> list[BaseTool]:
         GetNamespacesTool(),
         ListPodsTool(),
         GetPodLogsTool(),
+    ]
+
+
+def create_sqs_tools(sqs: SQSTools) -> list[BaseTool]:
+    """Create LangChain tools for AWS SQS (read-only)."""
+
+    class ListQueuesTool(BaseTool):
+        name: str = "sqs_list_queues"
+        description: str = "List AWS SQS queues. Discover available queues or find by name prefix."
+        args_schema: Type[BaseModel] = SQSListQueuesInput
+
+        def _run(self, queue_name_prefix: str = None, max_results: int = 100) -> str:
+            result = sqs.list_queues(queue_name_prefix=queue_name_prefix, max_results=max_results)
+            return str(result)
+
+    class GetQueueAttributesTool(BaseTool):
+        name: str = "sqs_get_queue_attributes"
+        description: str = "Get queue attributes: message counts, age of oldest message, visibility timeout, DLQ config."
+        args_schema: Type[BaseModel] = SQSGetQueueAttributesInput
+
+        def _run(self, queue_url: str) -> str:
+            result = sqs.get_queue_attributes(queue_url=queue_url)
+            return str(result)
+
+    class PeekMessagesTool(BaseTool):
+        name: str = "sqs_peek_messages"
+        description: str = "Peek at messages WITHOUT removing them (read-only). Messages stay in queue for other consumers."
+        args_schema: Type[BaseModel] = SQSPeekMessagesInput
+
+        def _run(self, queue_url: str, max_messages: int = 10, wait_time_seconds: int = 0) -> str:
+            result = sqs.peek_messages(queue_url=queue_url, max_messages=max_messages, wait_time_seconds=wait_time_seconds)
+            return str(result)
+
+    class GetQueueUrlTool(BaseTool):
+        name: str = "sqs_get_queue_url"
+        description: str = "Get the URL of a queue by its name. Useful when you know the name but need the full URL."
+        args_schema: Type[BaseModel] = SQSGetQueueUrlInput
+
+        def _run(self, queue_name: str, account_id: str = None) -> str:
+            result = sqs.get_queue_url(queue_name=queue_name, account_id=account_id)
+            return str(result)
+
+    return [
+        ListQueuesTool(),
+        GetQueueAttributesTool(),
+        PeekMessagesTool(),
+        GetQueueUrlTool(),
     ]

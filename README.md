@@ -1,6 +1,6 @@
 # SRE Copilot
 
-An AI-powered SRE chat assistant that integrates with Datadog APM, PagerDuty, and Kubernetes to help with application performance monitoring and on-call troubleshooting.
+An AI-powered SRE chat assistant that integrates with Datadog APM, PagerDuty, Kubernetes, and AWS SQS to help with application performance monitoring and on-call troubleshooting.
 
 ## 🚀 Quick Start (3 Commands!)
 
@@ -24,6 +24,7 @@ make run
 - **Datadog APM Integration**: Analyze service latency, search traces, investigate slow requests
 - **Kubernetes Integration**: Fetch real-time pod logs directly from your clusters
 - **PagerDuty Integration**: Manage incidents, check on-call schedules, view services
+- **AWS SQS Integration**: Inspect queue attributes, message counts, and peek at messages (read-only)
 - **Streamlit UI**: Beautiful web interface with real-time streaming responses
 - **Tool Orchestration**: AI automatically uses the right tools to answer your questions
 - **Multi-turn Conversations**: Maintains context across your entire session
@@ -38,6 +39,7 @@ make run
 - **Datadog API keys** - Optional, for APM features (latency, traces, service stats)
 - **PagerDuty API token** - Optional, for incident management
 - **Kubernetes kubeconfig** - Optional, for real-time pod log access
+- **AWS credentials** - Optional, for SQS queue inspection (supports IAM roles, profiles, or explicit keys)
 
 > **Note:** Streamlit is a Python web framework that powers the beautiful chat UI. It will be installed automatically when you run `make first-time-setup` or `make install`.
 
@@ -169,6 +171,7 @@ Optional integrations:
 - **Datadog APM** - Add `DATADOG_API_KEY` and `DATADOG_APP_KEY` for application performance monitoring (traces, latency, service stats)
 - **PagerDuty** - Add `PAGERDUTY_API_KEY` for incident management features
 - **Kubernetes** - Automatically enabled if `~/.kube/config` exists for real-time pod log access
+- **AWS SQS** - Automatically enabled; uses standard AWS credential chain (IAM roles, `~/.aws/credentials`, or explicit keys)
 
 ## Architecture
 
@@ -181,6 +184,7 @@ sre-copilot/
 │   ├── kubernetes_tools.py    # Kubernetes API integration
 │   ├── datadog_tools.py       # Datadog APM integration
 │   ├── pagerduty_tools.py     # PagerDuty API integration
+│   ├── sqs_tools.py           # AWS SQS integration
 │   └── langchain_tools.py     # LangChain tool wrappers
 ├── server.py                  # FastAPI backend (optional React UI)
 ├── frontend/                  # React frontend (optional)
@@ -227,6 +231,15 @@ sre-copilot/
 | `pagerduty_resolve_incident` | Resolve an incident |
 | `pagerduty_get_recent_alerts` | View recent alert triggers |
 
+### AWS SQS Tools (Read-Only)
+
+| Tool | Description |
+|------|-------------|
+| `sqs_list_queues` | List SQS queues in the account, optionally filter by name prefix |
+| `sqs_get_queue_attributes` | Get queue stats: message counts, oldest message age, DLQ config |
+| `sqs_peek_messages` | Peek at messages without removing them (read-only) |
+| `sqs_get_queue_url` | Get queue URL from queue name |
+
 ## Example Queries
 
 ```
@@ -247,6 +260,13 @@ sre-copilot/
 "Who is on-call right now?"
 "Get details for incident P12345"
 "Acknowledge incident P12345"
+
+# AWS SQS
+"List all SQS queues"
+"Show me queues with 'orders' in the name"
+"How many messages are in my-queue?"
+"What's the age of the oldest message in the DLQ?"
+"Peek at messages in the orders-queue"
 ```
 
 ## 💡 Using Kubernetes Features
@@ -316,6 +336,11 @@ make check-k8s
 | `DD_APP_KEY` | No | Alias for `DATADOG_APP_KEY` |
 | `DATADOG_SITE` | No | Datadog site (default: datadoghq.com) |
 | `PAGERDUTY_API_KEY` | No | PagerDuty API token |
+| `AWS_REGION` | No | AWS region for SQS (default: us-east-1) |
+| `AWS_ACCESS_KEY_ID` | No | AWS access key (optional, can use IAM roles/profiles) |
+| `AWS_SECRET_ACCESS_KEY` | No | AWS secret key (optional) |
+| `AWS_PROFILE` | No | AWS profile name (optional) |
+| `SQS_ENABLED` | No | Enable/disable SQS integration (default: true) |
 
 ## Docker
 
@@ -473,6 +498,7 @@ streamlit run app.py --server.port 8502  # Custom port
 tools/
 ├── datadog_tools.py       # Datadog API client (monitors, metrics, APM, K8s)
 ├── pagerduty_tools.py     # PagerDuty API client (incidents, on-call)
+├── sqs_tools.py           # AWS SQS client (queues, messages)
 └── langchain_tools.py     # LangChain tool wrappers for LLM
 
 agent.py                   # LangGraph agent with Claude + tool orchestration
@@ -510,6 +536,8 @@ We're planning to add support for more observability platforms:
 - Slack integration for collaborative incident response
 - Runbook automation and suggestions
 - Alert correlation and root cause analysis
+- AWS CloudWatch Logs integration
+- AWS SNS integration
 
 **UI/UX:**
 - Custom dashboards and saved queries
